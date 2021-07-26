@@ -1,5 +1,5 @@
 import smbus as sm
-import time
+import time, json, math
 from mqtt_client import MQTTClient
 
 channel = 1
@@ -11,7 +11,7 @@ writeup = 3 # command to write and update the dac
 dacs = [0,1,2,3,4,5,6,7] # each dac has a binary address
 all_dacs = 15 # all dacs at once
 
-defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.0.100", "remoteUser":"dacControl", "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0, "dacG":0, "dacH":0, "loadLast"=True}
+defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.0.103", "remoteUser":"dacControl", "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0, "dacG":0, "dacH":0, "loadLast":True}
 
 try:
     with open("lastSettings.json", "r") as f:
@@ -26,13 +26,14 @@ except:
 
 def recv(client, feed_id, payload):
 
+    print(payload)
     command = json.loads(payload)
 
     if command["command"] == "writeup":
         voltage = command["voltage"]
-        data = voltage/(5/(2**16)-1)
-        data = if (data > (math.floor(data) + 0.5)): math.ceil(data) else math.floor(data) 
-        
+        data = voltage/(5/((2**16)-1))
+        data = math.ceil(data) if (data > (math.floor(data) + 0.5)) else math.floor(data) 
+
         if data > ((2**16)-1): data = (2**16)-1
         if data < 0: data=0
 
@@ -50,7 +51,8 @@ def recv(client, feed_id, payload):
 
 
             client.publish("ack", "ack")
-        except:
+        except Exception as e:
+            print(e)
             client.publish("ack", "nack")
 
         saveSettings()
@@ -59,8 +61,9 @@ def saveSettings():
 
     try:
         with open("lastSettings.json", "w") as f:
-            json.dump(f)
-    except:
+            json.dump(defaultSettings, f)
+    except Exception as e:
+        print(e)
         pass
 
 
@@ -70,6 +73,9 @@ def dac_write(data, command, dac):
     # command should be 1 byte
     # dac should be 1 byte
 
+    if dac == "all":
+        dac = 15
+
     # full command sent to dac is (in binary) ccccaaaa dddddddd dddddddd
     b1 = (command<<4) + dac # first byte is 4 bits command then 4 bits which dac
     b2 = (data & (0xff << 8)) >> 8 # second byte is first byte of data (leftmost set of ds)
@@ -78,15 +84,14 @@ def dac_write(data, command, dac):
     bus.write_i2c_block_data(addr, b1, [b2, b3])
 
 
-
 # init mqtt
 client = MQTTClient(defaultSettings["user"], defaultSettings["password"], service_host=defaultSettings["remoteIP"], secure=False, port=5005)
-client.on_recv = recv
+client.on_message = recv
 
 try:
     client.connect()
     time.sleep(0.5)
-    client.subscribe("commands", feed_user=defaultSettings["remoteUser"])
+    client.subscribe("commands", feed_user=defaultSettings["remoteUser"], qos=1)
     time.sleep(0.1)
     conn = True
 except:
@@ -101,18 +106,26 @@ while True:
 
     if conn and (t_curr - t_update)>defaultSettings["mqttDelay"]:
         try:
-            client.loop(timeout_sec=0.5)
+            client.loop(timeout_sec=1)
             client.publish("state", json.dumps(defaultSettings))
             conn = True
-        except:
+        except Exception as e:
+            print(e)
             conn = False
+        
+        t_update = time.time()
 
     if not conn and (t_curr - t_reconn)>defaultSettings["mqttReconn"]:
         try:
             client.connect()
             time.sleep(0.5)
-            client.subscribe("commands", feed_user=defaultSettings["remoteUser"])
+            client.subscribe("commands", feed_user=defaultSettings["remoteUser"], qos=1)
             time.sleep(0.1)
             conn = True
-        except:
+        except Exception as e:
+            print(e)
             conn = False
+
+        t_reconn = time.time()
+
+    time.sleep(0.01)
