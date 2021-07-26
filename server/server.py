@@ -5,8 +5,6 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QPlainTextEdit
 from PyQt5 import QtWidgets, QtCore, QtGui
-from pyqtgraph import PlotWidget, plot
-import pyqtgraph as pg
 
 class MainWindow(QtWidgets.QMainWindow):
 
