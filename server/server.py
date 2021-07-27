@@ -57,15 +57,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dac_send_btn = []
         for i in range(8):
             self.dac_send.append(QLineEdit(parent=self))
-            self.dac_send[i].move(100, 90+i*50)
-            self.dac_send[i].resize(60, 50)
+            self.dac_send[i].move(120, 90+i*50)
+            self.dac_send[i].resize(80, 50)
             font = QtGui.QFont()
             font.setPointSize(12)
             self.dac_send[i].setFont(font)
             self.dac_send[i].show()
        
             self.dac_send_btn.append(QPushButton(f"Set {self.dacLabels[i]}", parent=self))
-            self.dac_send_btn[i].move(170, 90+50*i)
+            self.dac_send_btn[i].move(200, 90+50*i)
             self.dac_send_btn[i].resize(200, 50)
             font = QtGui.QFont()
             font.setPointSize(10)
@@ -77,15 +77,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         i=8
         self.dac_send.append(QLineEdit(parent=self))
-        self.dac_send[i].move(100, 90+10*50)
-        self.dac_send[i].resize(60, 50)
+        self.dac_send[i].move(120, 90+8*50)
+        self.dac_send[i].resize(80, 50)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.dac_send[i].setFont(font)
         self.dac_send[i].show()
    
         self.dac_send_btn.append(QPushButton(f"Set All", parent=self))
-        self.dac_send_btn[i].move(170, 90+50*10)
+        self.dac_send_btn[i].move(200, 90+50*8)
         self.dac_send_btn[i].resize(200, 50)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -99,7 +99,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for i in range(8):
             self.dac_readouts.append(QLineEdit(parent=self))
             self.dac_readouts[i].move(20, 90+i*50)
-            self.dac_readouts[i].resize(60, 50)
+            self.dac_readouts[i].resize(80, 50)
             font = QtGui.QFont()
             font.setPointSize(12)
             self.dac_readouts[i].setFont(font)
@@ -110,8 +110,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.adc_labels = []
         for i in range(3):
             self.adc_readouts.append(QLineEdit(parent=self))
-            self.adc_readouts[i].move(20, 900+i*50)
-            self.adc_readouts[i].resize(60, 50)
+            self.adc_readouts[i].move(20, 650+i*50)
+            self.adc_readouts[i].resize(80, 50)
             font = QtGui.QFont()
             font.setPointSize(12)
             self.adc_readouts[i].setFont(font)
@@ -119,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.adc_readouts[i].setReadOnly(True)
 
             self.adc_labels.append(QLabel(self.adc_names[i], parent=self))
-            self.adc_labels[i].move(20, 900+i*50)
+            self.adc_labels[i].move(120, 635+i*50)
             self.adc_labels[i].resize(220, 80)
             font = QtGui.QFont()
             font.setPointSize(10)
@@ -137,7 +137,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # ack is green when acked, else red
         self.ack_led = QLabel("",parent=self)
-        self.ack_led.move(20, 240+10*50)
+        self.ack_led.move(20, 240+7*50)
         self.ack_led.resize(30,30)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -150,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # ack label
         self.ack_label = QLabel('Command Acked', parent=self)
-        self.ack_label.move(60, 230+10*50)
+        self.ack_label.move(60, 230+7*50)
         self.ack_label.resize(400, 50)
         font = QtGui.QFont()
         font.setPointSize(10)
