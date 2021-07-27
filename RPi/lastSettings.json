@@ -1,1 +1,1 @@
-{"user": "dac", "password": "password", "remoteIP": "192.168.0.103", "remoteUser": "dacControl", "mqttDelay": 5, "mqttReconn": 5, "dacA": 13107, "dacB": 0, "dacC": 0, "dacD": 0, "dacE": 0, "dacF": 0, "dacG": 0, "dacH": 0, "loadLast": true}
+{"user": "dac", "password": "password", "remoteIP": "192.168.0.103", "remoteUser": "dacControl", "mqttDelay": 5, "mqttReconn": 5, "dacA": 52428, "dacB": 52428, "dacC": 52428, "dacD": 52428, "dacE": 52428, "dacF": 52428, "dacG": 52428, "dacH": 52428, "loadLast": true, "adcA": 0, "adcB": 0, "adcC": 0}

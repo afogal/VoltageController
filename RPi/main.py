@@ -11,7 +11,7 @@ bus = sm.SMBus(channel)
 writeup = 3 # command to write and update the dac
 dacs = [0,1,2,3,4,5,6,7] # each dac has a binary address
 all_dacs = 15 # all dacs at once
-adc = Adafruit_ADS1x15.ADS1015(address=0x48, busnum=1)
+adc = Adafruit_ADS1x15.ADS1015(address=0x48,i2c=bus, busnum=1)
 
 defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.0.103", "remoteUser":"dacControl",
                    "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0,
@@ -116,9 +116,10 @@ while True:
     if conn and (t_curr - t_update)>defaultSettings["mqttDelay"]:
         try:
             client.loop(timeout_sec=1)
-            defaultSettings['adcA'] = adc.read_adc_difference(0, gain=gain)
-            defaultSettings['adcB'] = adc.read_adc(2, gain=gain)
-            defaultSettings['adcC'] = adc.read_adc(3, gain=gain)
+            #defaultSettings['adcA'] = adc.read_adc_difference(0, gain=gain)
+            #defaultSettings['adcB'] = adc.read_adc(2, gain=gain)
+            #defaultSettings['adcC'] = adc.read_adc(3, gain=gain)
+            #print(defaultSettings['adcA'],defaultSettings['adcB'],defaultSettings['adcC'])
             client.publish("state", json.dumps(defaultSettings))
             conn = True
         except Exception as e:
