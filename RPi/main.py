@@ -1,6 +1,7 @@
 import smbus as sm
 import time, json, math
 from mqtt_client import MQTTClient
+import Adafruit_ADS1x15
 
 channel = 1
 addr = 0x72 # specific dac board (configurable by jumpers) , global address (write to all dac boards) is 0x73
@@ -10,8 +11,14 @@ bus = sm.SMBus(channel)
 writeup = 3 # command to write and update the dac
 dacs = [0,1,2,3,4,5,6,7] # each dac has a binary address
 all_dacs = 15 # all dacs at once
+adc = Adafruit_ADS1x15.ADS1015(address=0x48, busnum=1)
 
-defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.0.103", "remoteUser":"dacControl", "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0, "dacG":0, "dacH":0, "loadLast":True}
+defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.0.103", "remoteUser":"dacControl",
+                   "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0,
+                   "dacG":0, "dacH":0, "loadLast":True, "adcA":-1, "adcB":-1, "adcC":-1}
+
+# we dont worry about having negative values or loading old values for the adc stuff because it will read before
+#     sending every time, so we will only ever report real values.
 
 try:
     with open("lastSettings.json", "r") as f:
@@ -23,6 +30,7 @@ try:
 
 except:
     pass
+
 
 def recv(client, feed_id, payload):
 
@@ -100,6 +108,7 @@ except:
 
 t_update = time.time()
 t_reconn = time.time()
+gain = 2/3
 while True:
 
     t_curr = time.time()
@@ -107,6 +116,9 @@ while True:
     if conn and (t_curr - t_update)>defaultSettings["mqttDelay"]:
         try:
             client.loop(timeout_sec=1)
+            defaultSettings['adcA'] = adc.read_adc_difference(0, gain=gain)
+            defaultSettings['adcB'] = adc.read_adc(2, gain=gain)
+            defaultSettings['adcC'] = adc.read_adc(3, gain=gain)
             client.publish("state", json.dumps(defaultSettings))
             conn = True
         except Exception as e:

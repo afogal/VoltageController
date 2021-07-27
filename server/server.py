@@ -13,6 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.defaultSettings = {'user':"dacControl", 'password':'password', 'remoteIP':"192.168.0.103", "remoteUser":"dac"}
         self.dacLabels = ["dacA", "dacB", "dacC", "dacD", "dacE", "dacF", "dacG", "dacH"] # change these to smth more useful
+        self.adc_names = ['Phase', 'Power 1', 'Power 2']
         
         self.outFile = f"logs/logs_{dt.datetime.now().strftime('%Y-%m-%d_%H%M%S')}.csv"
 
@@ -56,7 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dac_send_btn = []
         for i in range(8):
             self.dac_send.append(QLineEdit(parent=self))
-            self.dac_send[i].move(20, 90+i*50)
+            self.dac_send[i].move(100, 90+i*50)
             self.dac_send[i].resize(60, 50)
             font = QtGui.QFont()
             font.setPointSize(12)
@@ -64,7 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.dac_send[i].show()
        
             self.dac_send_btn.append(QPushButton(f"Set {self.dacLabels[i]}", parent=self))
-            self.dac_send_btn[i].move(90, 90+50*i)
+            self.dac_send_btn[i].move(170, 90+50*i)
             self.dac_send_btn[i].resize(200, 50)
             font = QtGui.QFont()
             font.setPointSize(10)
@@ -76,7 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         i=8
         self.dac_send.append(QLineEdit(parent=self))
-        self.dac_send[i].move(20, 90+10*50)
+        self.dac_send[i].move(100, 90+10*50)
         self.dac_send[i].resize(60, 50)
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -84,7 +85,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dac_send[i].show()
    
         self.dac_send_btn.append(QPushButton(f"Set All", parent=self))
-        self.dac_send_btn[i].move(90, 90+50*10)
+        self.dac_send_btn[i].move(170, 90+50*10)
         self.dac_send_btn[i].resize(200, 50)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -93,6 +94,38 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         self.dac_send_btn[i].clicked.connect(self.button_functions[i])
+
+        self.dac_readouts = []
+        for i in range(8):
+            self.dac_readouts.append(QLineEdit(parent=self))
+            self.dac_readouts[i].move(20, 90+i*50)
+            self.dac_readouts[i].resize(60, 50)
+            font = QtGui.QFont()
+            font.setPointSize(12)
+            self.dac_readouts[i].setFont(font)
+            self.dac_readouts[i].show()
+            self.dac_readouts[i].setReadOnly(True)
+
+        self.adc_readouts = []
+        self.adc_labels = []
+        for i in range(3):
+            self.adc_readouts.append(QLineEdit(parent=self))
+            self.adc_readouts[i].move(20, 900+i*50)
+            self.adc_readouts[i].resize(60, 50)
+            font = QtGui.QFont()
+            font.setPointSize(12)
+            self.adc_readouts[i].setFont(font)
+            self.adc_readouts[i].show()
+            self.adc_readouts[i].setReadOnly(True)
+
+            self.adc_labels.append(QLabel(self.adc_names[i], parent=self))
+            self.adc_labels[i].move(20, 900+i*50)
+            self.adc_labels[i].resize(220, 80)
+            font = QtGui.QFont()
+            font.setPointSize(10)
+            self.adc_labels[i].setFont(font)
+            self.adc_labels[i].show()
+
         # command label
         self.command_label = QLabel('Commands:', parent=self)
         self.command_label.move(20, 20)
@@ -192,6 +225,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ack_time = time.time()
         elif feed_id == "state":
             state = json.loads(payload)
+
+            for i in range(8):
+                self.dac_readouts[i].setReadOnly(False)
+                voltage = 5*state[f"dac{chr(ord('A')+i)}"] / ((2**16)-1)
+                self.dac_readouts[i].setText(f"{voltage:.2f}")
+                self.dac_readouts[i].setReadOnly(True)
+
+            for i in range(3):
+                self.adc_readouts[i].setReadOnly(False)
+                self.adc_readouts[i].setText(f"{voltage:.2f}")
+                self.adc_readouts[i].setReadOnly(True)
 
 
     # add a new line to the bottom of the textbox
