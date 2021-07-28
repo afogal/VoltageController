@@ -50,6 +50,10 @@ To install dependancies:
 
 `sudo apt install python3 python3-paho-mqtt python3-smbus`
 
+`sudo pip3 install adafruit-circuitpython-busdevice adafruit-circuitpython-ads1x15 adafruit-blinka`
+
+`sudo pip3 install --upgrade RPi.GPIO adafruit-blinka`
+
 To run the script on startup add the following line to the user crontab (via running `crontab -e`):
 
 `@reboot /home/USER/VoltageController/RPi/startup.sh`
