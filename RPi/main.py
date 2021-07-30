@@ -13,7 +13,7 @@ addr = 0x72 # specific dac board (configurable by jumpers) , global address (wri
 
 #bus = sm.SMBus(channel)
 bus = I2C(board.SCL, board.SDA)
-dac = I2CDevice(bus, addr)
+dacboard = I2CDevice(bus, addr)
 
 writeup = 3 # command to write and update the dac
 dacs = [0,1,2,3,4,5,6,7] # each dac has a binary address
@@ -105,8 +105,8 @@ def dac_write(data, command, dac):
     b3 = data & 0xff # third byte is second byte of data (rightmost set of ds)
 
     #bus.write_i2c_block_data(addr, b1, [b2, b3])
-    with dac as device:
-        device.write(bytes([b1,b2,b3]))
+    with dacboard:
+        dacboard.write(bytes([b1,b2,b3]))
 
 
 
@@ -120,7 +120,8 @@ try:
     client.subscribe("commands", feed_user=defaultSettings["remoteUser"], qos=1)
     time.sleep(0.1)
     conn = True
-except:
+except Exception as e:
+    print(e)
     conn = False
 
 
