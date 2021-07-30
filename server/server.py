@@ -226,16 +226,20 @@ class MainWindow(QtWidgets.QMainWindow):
         elif feed_id == "state":
             state = json.loads(payload)
 
-            for i in range(8):
-                self.dac_readouts[i].setReadOnly(False)
-                voltage = 5*state[f"dac{chr(ord('A')+i)}"] / ((2**16)-1)
-                self.dac_readouts[i].setText(f"{voltage:.2f}")
-                self.dac_readouts[i].setReadOnly(True)
+            try:
+                for i in range(8):
+                    self.dac_readouts[i].setReadOnly(False)
+                    voltage = 5*state[f"dac{chr(ord('A')+i)}"] / ((2**16)-1)
+                    self.dac_readouts[i].setText(f"{voltage:.2f}")
+                    self.dac_readouts[i].setReadOnly(True)
 
-            for i in range(3):
-                self.adc_readouts[i].setReadOnly(False)
-                self.adc_readouts[i].setText(f"{voltage:.2f}")
-                self.adc_readouts[i].setReadOnly(True)
+                for i in range(3):
+                    self.adc_readouts[i].setReadOnly(False)
+                    voltage = state[f"adc{chr(ord('A')+i)}"]
+                    self.adc_readouts[i].setText(f"{voltage:.2f}")
+                    self.adc_readouts[i].setReadOnly(True)
+            except Exception as e:
+                print(e)
 
 
     # add a new line to the bottom of the textbox
