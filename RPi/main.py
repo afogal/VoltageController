@@ -1,34 +1,19 @@
 import smbus as sm
 import time, json, math
 from mqtt_client import MQTTClient
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.ads1x15 import Mode
-from adafruit_ads1x15.analog_in import AnalogIn
-import board
-from busio import I2C
-from adafruit_bus_device.i2c_device import I2CDevice
+import Adafruit_ADS1x15
 
 channel = 1
 addr = 0x72 # specific dac board (configurable by jumpers) , global address (write to all dac boards) is 0x73
 
-#bus = sm.SMBus(channel)
-bus = I2C(board.SCL, board.SDA)
-dac = I2CDevice(bus, addr)
+bus = sm.SMBus(channel)
 
 writeup = 3 # command to write and update the dac
 dacs = [0,1,2,3,4,5,6,7] # each dac has a binary address
 all_dacs = 15 # all dacs at once
-ads = ADS.ADS1115(bus, address=0x48)
-adcA = AnalogIn(ads, ADS.P0, ADS.P1)
-adcB = AnalogIn(ads, ADS.P2)
-adcC = AnalogIn(ads, ADS.P3)
-ads.data_rate = 860 # Max rate is 860
-_ = adcA.value
-_ = adcB.value
-_ = adcC.value
+adc = Adafruit_ADS1x15.ADS1015(address=0x48,i2c=bus, busnum=1)
 
-
-defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.0.103", "remoteUser":"dacControl",
+defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.1.103", "remoteUser":"dacControl",
                    "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0,
                    "dacG":0, "dacH":0, "loadLast":True, "adcA":-1, "adcB":-1, "adcC":-1}
 
@@ -104,10 +89,7 @@ def dac_write(data, command, dac):
     b2 = (data & (0xff << 8)) >> 8 # second byte is first byte of data (leftmost set of ds)
     b3 = data & 0xff # third byte is second byte of data (rightmost set of ds)
 
-    #bus.write_i2c_block_data(addr, b1, [b2, b3])
-    with dac as device:
-        device.write(bytes([b1,b2,b3]))
-
+    bus.write_i2c_block_data(addr, b1, [b2, b3])
 
 
 # init mqtt
@@ -134,10 +116,10 @@ while True:
     if conn and (t_curr - t_update)>defaultSettings["mqttDelay"]:
         try:
             client.loop(timeout_sec=1)
-            defaultSettings['adcA'] = adcA.voltage
-            defaultSettings['adcB'] = adcB.voltage
-            defaultSettings['adcC'] = adcC.voltage
-            print(defaultSettings['adcA'],defaultSettings['adcB'],defaultSettings['adcC'])
+            #defaultSettings['adcA'] = adc.read_adc_difference(0, gain=gain)
+            #defaultSettings['adcB'] = adc.read_adc(2, gain=gain)
+            #defaultSettings['adcC'] = adc.read_adc(3, gain=gain)
+            #print(defaultSettings['adcA'],defaultSettings['adcB'],defaultSettings['adcC'])
             client.publish("state", json.dumps(defaultSettings))
             conn = True
         except Exception as e:
