@@ -30,7 +30,7 @@ _ = adcB.value
 _ = adcC.value
 
 
-defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.1.100", "remoteUser":"dacControl",
+defaultSettings = {"user":"dac", "password":"password", "remoteIP":"127.0.0.1", "remoteUser":"dacControl",
                    "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0,
                    "dacG":0, "dacH":0, "loadLast":True, "adcA":-1, "adcB":-1, "adcC":-1}
 
