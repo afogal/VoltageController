@@ -11,7 +11,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
-        self.defaultSettings = {'user':"dacControl", 'password':'password', 'remoteIP':"192.168.1.103", "remoteUser":"dac"}
+        self.defaultSettings = {'user':"dacControl", 'password':'password', 'remoteIP':"192.168.1.100", "remoteUser":"dac"}
         self.dacLabels = ["dacA", "dacB", "dacC", "dacD", "dacE", "dacF", "dacG", "dacH"] # change these to smth more useful
         self.adc_names = ['Phase', 'Power 1', 'Power 2']
         
