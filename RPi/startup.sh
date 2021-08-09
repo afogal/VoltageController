@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 main.py
+python3 /home/jddmartin/VoltageController/RPi/main.py

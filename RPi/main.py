@@ -7,6 +7,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import board
 from busio import I2C
 from adafruit_bus_device.i2c_device import I2CDevice
+import numpy as np
 
 channel = 1
 addr = 0x72 # specific dac board (configurable by jumpers) , global address (write to all dac boards) is 0x73
@@ -19,16 +20,17 @@ writeup = 3 # command to write and update the dac
 dacs = [0,1,2,3,4,5,6,7] # each dac has a binary address
 all_dacs = 15 # all dacs at once
 ads = ADS.ADS1115(bus, address=0x48)
-adcA = AnalogIn(ads, ADS.P0, ADS.P1)
+adcA = AnalogIn(ads, ADS.P0)#, ADS.P1)
 adcB = AnalogIn(ads, ADS.P2)
 adcC = AnalogIn(ads, ADS.P3)
 ads.data_rate = 860 # Max rate is 860
+ads.mode = Mode.SINGLE
 _ = adcA.value
 _ = adcB.value
 _ = adcC.value
 
 
-defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.1.103", "remoteUser":"dacControl",
+defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.1.100", "remoteUser":"dacControl",
                    "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0,
                    "dacG":0, "dacH":0, "loadLast":True, "adcA":-1, "adcB":-1, "adcC":-1}
 
@@ -125,6 +127,9 @@ except Exception as e:
     conn = False
 
 
+listA = []
+listB = []
+listC = []
 t_update = time.time()
 t_reconn = time.time()
 gain = 2/3
@@ -132,12 +137,21 @@ while True:
 
     t_curr = time.time()
 
+
+    listA.append(adcA.voltage)
+    listB.append(adcB.voltage)
+    listC.append(adcC.voltage)
+
+
     if conn and (t_curr - t_update)>defaultSettings["mqttDelay"]:
         try:
             client.loop(timeout_sec=1)
-            defaultSettings['adcA'] = adcA.voltage
-            defaultSettings['adcB'] = adcB.voltage
-            defaultSettings['adcC'] = adcC.voltage
+            defaultSettings['adcA'] = np.median(listA)
+            defaultSettings['adcB'] = np.median(listB)
+            defaultSettings['adcC'] = np.median(listC)
+            listA = []
+            listB = []
+            listC = []
             print(defaultSettings['adcA'],defaultSettings['adcB'],defaultSettings['adcC'])
             client.publish("state", json.dumps(defaultSettings))
             conn = True
