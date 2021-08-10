@@ -23,7 +23,8 @@ To ensure it runs on startup (and run it now):
 
 You also have to copy the `mosquitto.conf`:
 
-` sudo cp mosquitto.conf /etc/mosquitto/mosquitto.conf ` 
+` sudo cp mosquitto.conf.etc /etc/mosquitto/mosquitto.conf ` 
+` sudo cp mosquitto.passwd /etc/mosquitto/mosquitto.passwd `
 
 ### Command UI
 
