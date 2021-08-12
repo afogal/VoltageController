@@ -22,7 +22,7 @@ all_dacs = 15 # all dacs at once
 ads = ADS.ADS1115(bus, address=0x48)
 adcA = AnalogIn(ads, ADS.P0)#, ADS.P1)
 adcB = AnalogIn(ads, ADS.P2)
-adcC = AnalogIn(ads, ADS.P3)
+adcC = AnalogIn(ads, ADS.P1)
 ads.data_rate = 860 # Max rate is 860
 ads.mode = Mode.SINGLE
 _ = adcA.value
@@ -30,23 +30,9 @@ _ = adcB.value
 _ = adcC.value
 
 
-defaultSettings = {"user":"dac", "password":"password", "remoteIP":"127.0.0.1", "remoteUser":"dacControl",
+defaultSettings = {"user":"dac", "password":"password", "remoteIP":"192.168.1.4", "remoteUser":"dacControl",
                    "mqttDelay":5,"mqttReconn":5, "dacA":0, "dacB":0, "dacC":0, "dacD":0, "dacE":0, "dacF":0,
                    "dacG":0, "dacH":0, "loadLast":True, "adcA":-1, "adcB":-1, "adcC":-1}
-
-# we dont worry about having negative values or loading old values for the adc stuff because it will read before
-#     sending every time, so we will only ever report real values.
-
-try:
-    with open("lastSettings.json", "r") as f:
-        defaultSettings = json.load(f)
-
-        if defaultSettings["loadLast"]:
-            for i in range(8):
-                dac_write(defaultSettings[f"dac{chr(ord('A')+i)}"], writeup, i)  
-
-except:
-    pass
 
 
 def recv(client, feed_id, payload):
@@ -109,6 +95,20 @@ def dac_write(data, command, dac):
     #bus.write_i2c_block_data(addr, b1, [b2, b3])
     with dacboard:
         dacboard.write(bytes([b1,b2,b3]))
+
+# we dont worry about having negative values or loading old values for the adc stuff because it will read before
+#     sending every time, so we will only ever report real values.
+
+try:
+    with open("lastSettings.json", "r") as f:
+        defaultSettings = json.load(f)
+
+        if defaultSettings["loadLast"]:
+            for i in range(8):
+                dac_write(defaultSettings[f"dac{chr(ord('A')+i)}"], writeup, i)  
+
+except Exception as e:
+    print(e)
 
 
 

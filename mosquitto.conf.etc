@@ -1,0 +1,17 @@
+max_queued_messages 200
+message_size_limit 0
+allow_zero_length_clientid true
+allow_duplicate_messages true
+
+listener 5005
+autosave_interval 900
+autosave_on_changes false
+persistence true
+persistence_file /etc/mosquitto/mosquitto.db
+allow_anonymous true
+password_file /etc/mosquitto/mosquitto.passwd
+require_certificate false
+max_inflight_messages 0
+max_queued_messages 0
+persistent_client_expiration 1h
+log_type all
